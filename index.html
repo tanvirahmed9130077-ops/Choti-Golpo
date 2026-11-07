@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#35245f">
+<title>গল্পের জগৎ | বাংলা গল্প পড়ুন</title>
+<meta name="description" content="গল্পের জগৎ-এ পড়ুন বাংলা গল্প, উপন্যাস ও নানা বিষয়ের মৌলিক লেখা। পছন্দের ক্যাটাগরি থেকে গল্প খুঁজে নিন।">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta property="og:type" content="website">
+<meta property="og:title" content="গল্পের জগৎ | বাংলা গল্প পড়ুন">
+<meta property="og:description" content="বাংলা গল্পের অনলাইন সংগ্রহ।">
+<meta property="og:locale" content="bn_BD">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f7f6fb;color:#29243a;font-family:Arial,"Noto Sans Bengali",sans-serif;line-height:1.7}
+header{background:#35245f;color:white;text-align:center;padding:25px 15px}
+header h1{margin:0;font-size:29px}
+header p{margin:5px 0 14px;color:#e5ddf5}
+button{border:0;border-radius:8px;padding:10px 15px;cursor:pointer;font-size:14px}
+button:disabled{opacity:.55;cursor:not-allowed}
+.primary{background:#6546a5;color:white}
+.secondary{background:#eee9f7;color:#493477}
+.danger{background:#ffeded;color:#b42332}
+.container{width:min(1100px,94%);margin:24px auto}
+input,textarea,select{width:100%;padding:12px;border:1px solid #ddd7e8;border-radius:8px;font:inherit;background:white}
+textarea{resize:vertical}
+.search{display:flex;gap:8px;margin:20px 0}
+.search input{flex:1;min-width:0}
+.categories{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 25px}
+.category{background:white;border:1px solid #ddd7e8;color:#443b55}
+.category.active{background:#6546a5;color:white}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(245px,1fr));gap:15px}
+.card{background:white;border:1px solid #e8e3ef;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:9px;min-width:0}
+.card h3{margin:0;font-size:18px;overflow-wrap:anywhere}
+.card p{margin:0;color:#716b7e;font-size:14px;overflow-wrap:anywhere}
+.card .read{margin-top:auto}
+.tag{display:inline-block;background:#f0ecf7;color:#594480;border-radius:20px;padding:3px 9px;font-size:12px;margin:2px}
+.muted{color:#777184;font-size:13px}
+.admin,.login{background:white;border:1px solid #e8e3ef;border-radius:12px;padding:18px;margin:25px 0;display:none}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field{margin-bottom:12px}
+.field label{display:block;font-weight:bold;font-size:14px;margin-bottom:5px}
+.full{grid-column:1/-1}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.message{margin:12px 0;padding:10px;border-radius:8px;background:#f0ecf7;display:none;overflow-wrap:anywhere}
+.status{text-align:center;padding:25px;color:#777184}
+.reader{display:none;position:fixed;inset:0;background:#0009;z-index:10;padding:15px;overflow:auto}
+.readerbox{background:white;border-radius:12px;padding:22px;max-width:800px;margin:25px auto}
+.readerbox h2{overflow-wrap:anywhere}
+.storytext{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.9}
+.pagination{text-align:center;margin:25px}
+footer{text-align:center;padding:25px;color:#777184;font-size:13px}
+.hidden{display:none!important}
+@media(max-width:600px){header h1{font-size:24px}.formgrid{grid-template-columns:1fr}.full{grid-column:auto}.search{flex-direction:column}.readerbox{padding:16px}}
+</style>
+<script type="application/ld+json" id="websiteSchema">
+{"@context":"https://schema.org","@type":"WebSite","name":"গল্পের জগৎ","description":"বাংলা গল্পের অনলাইন সংগ্রহ","inLanguage":"bn-BD"}
+</script>
+</head>
+<body>
+<header>
+  <h1>📚 গল্পের জগৎ</h1>
+  <p>বাংলা গল্পের একটি অনলাইন সংগ্রহ</p>
+  <button id="loginToggle" class="secondary">অ্যাডমিন লগইন</button>
+  <button id="logout" class="danger" hidden>লগআউট</button>
+</header>
+
+<main class="container">
+  <section id="loginBox" class="login">
+    <h2>অ্যাডমিন লগইন</h2>
+    <form id="loginForm">
+      <div class="field"><label for="email">ইমেইল</label><input id="email" type="email" autocomplete="username" required></div>
+      <div class="field"><label for="password">পাসওয়ার্ড</label><input id="password" type="password" autocomplete="current-password" required></div>
+      <button class="primary" type="submit">লগইন</button>
+      <p id="loginMessage" class="message" role="status"></p>
+    </form>
+  </section>
+
+  <section id="adminBox" class="admin">
+    <h2>অ্যাডমিন প্যানেল</h2>
+    <p class="muted">এখান থেকে গল্প যোগ, সম্পাদনা ও মুছে ফেলতে পারবে।</p>
+    <form id="storyForm">
+      <input type="hidden" id="editId">
+      <div class="formgrid">
+        <div class="field full"><label for="title">গল্পের নাম *</label><input id="title" maxlength="180" required></div>
+        <div class="field"><label for="category">ক্যাটাগরি *</label><select id="category" required></select></div>
+        <div class="field"><label for="tags">ট্যাগ (কমা দিয়ে আলাদা করো)</label><input id="tags" placeholder="উপন্যাস, পরিবার, জীবন"></div>
+        <div class="field full"><label for="description">সংক্ষিপ্ত বিবরণ</label><textarea id="description" rows="3" maxlength="500"></textarea></div>
+        <div class="field full"><label for="content">সম্পূর্ণ গল্প *</label><textarea id="content" rows="12" required></textarea></div>
+      </div>
+      <div class="actions">
+        <button class="primary" id="saveButton" type="submit">গল্প প্রকাশ করুন</button>
+        <button class="secondary" id="cancelEdit" type="button" hidden>সম্পাদনা বাতিল</button>
+      </div>
+      <p id="formMessage" class="message" role="status"></p>
+    </form>
+  </section>
+
+  <section>
+    <div class="search">
+      <input id="search" type="search" placeholder="গল্পের নাম, লেখা বা ট্যাগ দিয়ে খুঁজুন..." aria-label="গল্প খুঁজুন">
+      <button class="primary" id="searchBtn">খুঁজুন</button>
+      <button class="secondary" id="clearSearch">মুছুন</button>
+    </div>
+    <h2>গল্পের ক্যাটাগরি</h2>
+    <div id="categories" class="categories"></div>
+    <h2 id="listTitle">সকল গল্প</h2>
+    <p id="count" class="muted"></p>
+    <div id="status" class="status" role="status">গল্প লোড হচ্ছে...</div>
+    <div id="storyGrid" class="grid"></div>
+    <div class="pagination"><button id="more" class="secondary" hidden>আরও গল্প দেখুন</button></div>
+  </section>
+</main>
+
+<div id="reader" class="reader" role="dialog" aria-modal="true" aria-labelledby="readerTitle">
+  <article class="readerbox">
+    <div class="actions" style="justify-content:space-between;align-items:center">
+      <h2 id="readerTitle"></h2>
+      <button id="closeReader" class="danger">বন্ধ করুন ✕</button>
+    </div>
+    <p id="readerMeta" class="muted"></p>
+    <p id="readerDescription"></p>
+    <div id="readerTags"></div>
+    <hr>
+    <div id="readerContent" class="storytext"></div>
+  </article>
+</div>
+<footer>© <span id="year"></span> গল্পের জগৎ</footer>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc,
+  serverTimestamp, query, orderBy, limit, startAfter, where, getDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* Firebase configuration from your Firebase project */
+const firebaseConfig = {
+  apiKey: "AIzaSyApvSjpbcfLWpmXJ44JgPwljYq2_FbKJvc",
+  authDomain: "choti-golpo-d345f.firebaseapp.com",
+  projectId: "choti-golpo-d345f",
+  storageBucket: "choti-golpo-d345f.firebasestorage.app",
+  messagingSenderId: "514005323834",
+  appId: "1:1e3dd88db0c20691252503"
+};
+
+/* Only this Firebase user is shown the admin controls.
+   Firestore Security Rules must enforce the same UID too. */
+const ADMIN_UID = "A6SPAqpkh0ceJkEntee9m89BXlX2";
+const PAGE_SIZE = 24;
+const SEARCH_LIMIT = 100;
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const storiesRef = collection(db, "stories");
+
+const CATEGORIES = [
+  "মায়ের গল্প",
+  "মাসির গল্প",
+  "পিসির গল্প",
+  "প্রেমিকা গল্প",
+  "বৌদির গল্প",
+  "কাকিমার গল্প",
+  "ম্যাডামের গল্প",
+  "কাজের মহিলার গল্প",
+  "বয়স্ক মহিলার গল্প"
+];
+
+const $ = id => document.getElementById(id);
+let currentUser = null;
+let selectedCategory = "";
+let lastDoc = null;
+let loading = false;
+let searchMode = false;
+let searchResults = [];
+let searchPosition = 0;
+let displayedCount = 0;
+let activeStoryId = null;
+
+$("year").textContent = new Date().getFullYear();
+
+function showMessage(element, message) {
+  element.textContent = message;
+  element.style.display = "block";
+}
+function hideMessage(element) {
+  element.textContent = "";
+  element.style.display = "none";
+}
+function normalizeTokens(value) {
+  const matches = String(value || "").toLocaleLowerCase("bn").match(/[\p{L}\p{N}]+/gu) || [];
+  return [...new Set(matches)].filter(word => word.length > 1).slice(0, 1000);
+}
+function makeSearchTokens(data) {
+  return normalizeTokens([
+    data.title, data.category, data.description,
+    ...(data.tags || []), data.content
+  ].join(" "));
+}
+function safeDate(value) {
+  if (!value) return "";
+  try {
+    const date = value.toDate ? value.toDate() : new Date(value);
+    return date.toLocaleDateString("bn-BD");
+  } catch {
+    return "";
+  }
+}
+function setLoading(message) {
+  $("status").textContent = message;
+  $("status").style.display = "block";
+}
+function updateCount() {
+  $("count").textContent = `দেখানো হয়েছে ${displayedCount}টি গল্প`;
+}
+function clearGrid() {
+  $("storyGrid").replaceChildren();
+  displayedCount = 0;
+  updateCount();
+}
+function addTag(parent, text) {
+  const span = document.createElement("span");
+  span.className = "tag";
+  span.textContent = text;
+  parent.appendChild(span);
+}
+
+function updatePageMeta(title, description, url) {
+  document.title = title;
+  let desc = document.querySelector('meta[name="description"]');
+  if (desc) desc.setAttribute("content", description.slice(0, 300));
+  let canonical = document.querySelector('link[rel="canonical"]');
+  if (!canonical) {
+    canonical = document.createElement("link");
+    canonical.rel = "canonical";
+    document.head.appendChild(canonical);
+  }
+  canonical.href = url;
+}
+const homeTitle = "গল্পের জগৎ | বাংলা গল্প পড়ুন";
+const homeDescription = "গল্পের জগৎ-এ পড়ুন বাংলা গল্প ও নানা বিষয়ের মৌলিক লেখা।";
+
+function openStory(story, id, updateUrl = true) {
+  activeStoryId = id;
+  $("readerTitle").textContent = story.title || "নামহীন গল্প";
+  $("readerMeta").textContent = `${story.category || ""}${story.createdAt ? " • " + safeDate(story.createdAt) : ""}`;
+  $("readerDescription").textContent = story.description || "";
+  $("readerContent").textContent = story.content || "";
+  const tagsBox = $("readerTags");
+  tagsBox.replaceChildren();
+  (story.tags || []).forEach(tag => addTag(tagsBox, tag));
+  $("reader").style.display = "block";
+  document.body.style.overflow = "hidden";
+
+  const storyUrl = new URL(location.href);
+  storyUrl.searchParams.set("story", id);
+  updatePageMeta(
+    `${story.title || "বাংলা গল্প"} | গল্পের জগৎ`,
+    story.description || `${story.title || "বাংলা গল্প"} — গল্পের জগৎ-এ পড়ুন।`,
+    storyUrl.href
+  );
+  if (updateUrl) history.pushState({storyId:id}, "", storyUrl.href);
+  document.querySelector('meta[property="og:title"]')?.setAttribute("content", `${story.title || "বাংলা গল্প"} | গল্পের জগৎ`);
+  document.querySelector('meta[property="og:description"]')?.setAttribute("content", story.description || homeDescription);
+  setArticleSchema(story, storyUrl.href);
+}
+function setArticleSchema(story, url) {
+  let schema = $("articleSchema");
+  if (!schema) {
+    schema = document.createElement("script");
+    schema.type = "application/ld+json";
+    schema.id = "articleSchema";
+    document.head.appendChild(schema);
+  }
+  schema.textContent = JSON.stringify({
+    "@context":"https://schema.org",
+    "@type":"Article",
+    "headline":story.title || "বাংলা গল্প",
+    "description":story.description || "",
+    "inLanguage":"bn-BD",
+    "articleSection":story.category || "",
+    "url":url
+  });
+}
+function closeStory(updateUrl = true) {
+  $("reader").style.display = "none";
+  document.body.style.overflow = "";
+  activeStoryId = null;
+  document.title = homeTitle;
+  const desc = document.querySelector('meta[name="description"]');
+  if (desc) desc.content = homeDescription;
+  document.querySelector('meta[property="og:title"]')?.setAttribute("content", homeTitle);
+  document.querySelector('meta[property="og:description"]')?.setAttribute("content", homeDescription);
+  $("articleSchema")?.remove();
+  const canonical = document.querySelector('link[rel="canonical"]');
+  if (canonical) canonical.remove();
+  if (updateUrl) {
+    const url = new URL(location.href);
+    url.searchParams.delete("story");
+    history.pushState({}, "", url);
+  }
+}
+$("closeReader").addEventListener("click", () => closeStory());
+$("reader").addEventListener("click", event => {
+  if (event.target === $("reader")) closeStory();
+});
+window.addEventListener("popstate", () => {
+  const id = new URL(location.href).searchParams.get("story");
+  if (!id) {
+    if (activeStoryId) closeStory(false);
+  } else if (id !== activeStoryId) {
+    openStoryById(id, false);
+  }
+});
+
+async function openStoryById(id, updateUrl = false) {
+  try {
+    const snapshot = await getDoc(doc(db, "stories", id));
+    if (snapshot.exists()) openStory(snapshot.data(), snapshot.id, updateUrl);
+  } catch (error) {
+    console.error("Story URL load failed:", error);
+  }
+}
+
+function renderCard(item) {
+  const story = item.data;
+  const card = document.createElement("article");
+  card.className = "card";
+
+  const title = document.createElement("h3");
+  title.textContent = story.title || "নামহীন গল্প";
+  card.appendChild(title);
+
+  const category = document.createElement("p");
+  category.textContent = story.category || "";
+  card.appendChild(category);
+
+  const description = document.createElement("p");
+  description.textContent = story.description || (story.content || "").slice(0, 140);
+  card.appendChild(description);
+
+  const tagsBox = document.createElement("div");
+  (story.tags || []).slice(0, 5).forEach(tag => addTag(tagsBox, tag));
+  card.appendChild(tagsBox);
+
+  const readButton = document.createElement("button");
+  readButton.className = "primary read";
+  readButton.textContent = "গল্পটি পড়ুন";
+  readButton.addEventListener("click", () => openStory(story, item.id));
+  card.appendChild(readButton);
+
+  if (currentUser && currentUser.uid === ADMIN_UID) {
+    const actions = document.createElement("div");
+    actions.className = "actions";
+
+    const editButton = document.createElement("button");
+    editButton.className = "secondary";
+    editButton.textContent = "সম্পাদনা";
+    editButton.addEventListener("click", () => startEdit(item.id, story));
+
+    const deleteButton = document.createElement("button");
+    deleteButton.className = "danger";
+    deleteButton.textContent = "মুছে ফেলুন";
+    deleteButton.addEventListener("click", () => removeStory(item.id));
+
+    actions.append(editButton, deleteButton);
+    card.appendChild(actions);
+  }
+
+  $("storyGrid").appendChild(card);
+  displayedCount++;
+  updateCount();
+}
+
+function populateCategories() {
+  const categoryBox = $("categories");
+  const categorySelect = $("category");
+  categoryBox.replaceChildren();
+  categorySelect.replaceChildren();
+
+  const allButton = document.createElement("button");
+  allButton.className = "category active";
+  allButton.textContent = "সব গল্প";
+  allButton.addEventListener("click", () => chooseCategory(""));
+  categoryBox.appendChild(allButton);
+
+  CATEGORIES.forEach(name => {
+    const button = document.createElement("button");
+    button.className = "category";
+    button.textContent = name;
+    button.addEventListener("click", () => chooseCategory(name));
+    categoryBox.appendChild(button);
+
+    const option = document.createElement("option");
+    option.value = name;
+    option.textContent = name;
+    categorySelect.appendChild(option);
+  });
+}
+function refreshCategoryButtons() {
+  [...$("categories").children].forEach(button => {
+    const active = (selectedCategory === "" && button.textContent === "সব গল্প") ||
+      button.textContent === selectedCategory;
+    button.classList.toggle("active", active);
+  });
+}
+function resetListing() {
+  lastDoc = null;
+  searchMode = false;
+  searchResults = [];
+  searchPosition = 0;
+  clearGrid();
+  $("more").hidden = true;
+}
+function chooseCategory(name) {
+  selectedCategory = name;
+  $("search").value = "";
+  resetListing();
+  refreshCategoryButtons();
+  $("listTitle").textContent = name || "সকল গল্প";
+  loadNextPage();
+}
+
+async function loadNextPage() {
+  if (loading || searchMode) return;
+  loading = true;
+  $("more").disabled = true;
+  setLoading("গল্প লোড হচ্ছে...");
+  try {
+    let q;
+    if (selectedCategory) {
+      const constraints = [where("category", "==", selectedCategory), limit(PAGE_SIZE)];
+      if (lastDoc) constraints.splice(1, 0, startAfter(lastDoc));
+      q = query(storiesRef, ...constraints);
+    } else {
+      const constraints = [orderBy("createdAt", "desc"), limit(PAGE_SIZE)];
+      if (lastDoc) constraints.splice(1, 0, startAfter(lastDoc));
+      q = query(storiesRef, ...constraints);
+    }
+    const snapshot = await getDocs(q);
+    if (snapshot.empty && displayedCount === 0) {
+      setLoading("এখনো কোনো গল্প প্রকাশ করা হয়নি।");
+      $("more").hidden = true;
+      return;
+    }
+    snapshot.docs.forEach(storyDoc => renderCard({id:storyDoc.id,data:storyDoc.data()}));
+    lastDoc = snapshot.docs[snapshot.docs.length - 1] || lastDoc;
+    $("status").style.display = "none";
+    $("more").hidden = snapshot.docs.length < PAGE_SIZE;
+  } catch (error) {
+    console.error(error);
+    setLoading("গল্প লোড করা যায়নি। ইন্টারনেট ও Firestore Rules পরীক্ষা করো।");
+  } finally {
+    loading = false;
+    $("more").disabled = false;
+  }
+}
+
+async function runSearch() {
+  const words = normalizeTokens($("search").value);
+  if (!words.length) {
+    chooseCategory(selectedCategory);
+    return;
+  }
+  resetListing();
+  searchMode = true;
+  $("listTitle").textContent = "অনুসন্ধানের ফলাফল";
+  setLoading("খোঁজা হচ্ছে...");
+  $("more").hidden = true;
+  try {
+    const q = query(storiesRef, where("searchTokens", "array-contains", words[0]), limit(SEARCH_LIMIT));
+    const snapshot = await getDocs(q);
+    searchResults = snapshot.docs
+      .map(d => ({id:d.id,data:d.data()}))
+      .filter(item => {
+        const data = item.data;
+        const tokens = data.searchTokens || [];
+        return words.every(word => tokens.includes(word)) &&
+          (!selectedCategory || data.category === selectedCategory);
+      })
+      .sort((a,b) => (b.data.createdAt?.toMillis?.() || 0) - (a.data.createdAt?.toMillis?.() || 0));
+    if (!searchResults.length) {
+      setLoading("কোনো গল্প পাওয়া যায়নি। বানান পরিবর্তন করে আবার চেষ্টা করো।");
+      return;
+    }
+    $("status").style.display = "none";
+    showSearchPage();
+  } catch (error) {
+    console.error(error);
+    setLoading("অনুসন্ধান করা যায়নি। নতুন কোড দিয়ে প্রকাশিত গল্পে searchTokens তৈরি হয়েছে কি না পরীক্ষা করো।");
+  }
+}
+function showSearchPage() {
+  const next = searchResults.slice(searchPosition, searchPosition + PAGE_SIZE);
+  next.forEach(renderCard);
+  searchPosition += next.length;
+  $("more").hidden = searchPosition >= searchResults.length;
+  $("count").textContent = `সর্বোচ্চ ${SEARCH_LIMIT}টি সম্ভাব্য ফলাফলের মধ্যে পাওয়া গেছে ${searchResults.length}টি`;
+}
+$("more").addEventListener("click", () => searchMode ? showSearchPage() : loadNextPage());
+$("searchBtn").addEventListener("click", runSearch);
+$("search").addEventListener("keydown", event => {
+  if (event.key === "Enter") runSearch();
+});
+$("clearSearch").addEventListener("click", () => {
+  $("search").value = "";
+  chooseCategory(selectedCategory);
+});
+
+$("loginToggle").addEventListener("click", () => {
+  const box = $("loginBox");
+  box.style.display = box.style.display === "block" ? "none" : "block";
+});
+$("loginForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  hideMessage($("loginMessage"));
+  try {
+    await signInWithEmailAndPassword(auth, $("email").value.trim(), $("password").value);
+    $("password").value = "";
+    $("loginBox").style.display = "none";
+  } catch (error) {
+    console.error(error);
+    showMessage($("loginMessage"), "লগইন হয়নি। ইমেইল ও পাসওয়ার্ড পরীক্ষা করো।");
+  }
+});
+$("logout").addEventListener("click", () => signOut(auth));
+
+onAuthStateChanged(auth, user => {
+  currentUser = user && user.uid === ADMIN_UID ? user : null;
+  const isAdmin = !!currentUser;
+  $("adminBox").style.display = isAdmin ? "block" : "none";
+  $("logout").hidden = !isAdmin;
+  $("loginToggle").hidden = isAdmin;
+  resetListing();
+  loadNextPage();
+});
+
+function resetForm() {
+  $("storyForm").reset();
+  $("editId").value = "";
+  $("saveButton").textContent = "গল্প প্রকাশ করুন";
+  $("cancelEdit").hidden = true;
+  hideMessage($("formMessage"));
+}
+$("cancelEdit").addEventListener("click", resetForm);
+
+function startEdit(id, story) {
+  $("editId").value = id;
+  $("title").value = story.title || "";
+  $("category").value = story.category || CATEGORIES[0];
+  $("tags").value = (story.tags || []).join(", ");
+  $("description").value = story.description || "";
+  $("content").value = story.content || "";
+  $("saveButton").textContent = "পরিবর্তন সংরক্ষণ করুন";
+  $("cancelEdit").hidden = false;
+  $("adminBox").scrollIntoView({behavior:"smooth"});
+}
+
+$("storyForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  hideMessage($("formMessage"));
+  if (!currentUser || currentUser.uid !== ADMIN_UID) {
+    showMessage($("formMessage"), "এই কাজের অনুমতি নেই।");
+    return;
+  }
+  const tags = $("tags").value.split(",").map(t => t.trim()).filter(Boolean);
+  const data = {
+    title: $("title").value.trim(),
+    category: $("category").value,
+    tags,
+    description: $("description").value.trim(),
+    content: $("content").value.trim()
+  };
+  if (!data.title || !data.content) {
+    showMessage($("formMessage"), "গল্পের নাম ও সম্পূর্ণ গল্প লিখতে হবে।");
+    return;
+  }
+  data.searchTokens = makeSearchTokens(data);
+  $("saveButton").disabled = true;
+  try {
+    const editId = $("editId").value;
+    if (editId) {
+      await updateDoc(doc(db, "stories", editId), {...data, updatedAt:serverTimestamp()});
+    } else {
+      await addDoc(storiesRef, {...data, createdAt:serverTimestamp(), updatedAt:serverTimestamp()});
+    }
+    resetForm();
+    resetListing();
+    await loadNextPage();
+    showMessage($("formMessage"), editId ? "গল্পের পরিবর্তন সংরক্ষণ হয়েছে।" : "গল্প সফলভাবে প্রকাশ হয়েছে।");
+  } catch (error) {
+    console.error(error);
+    showMessage($("formMessage"), "সংরক্ষণ করা যায়নি। Firestore Rules পরীক্ষা করো।");
+  } finally {
+    $("saveButton").disabled = false;
+  }
+});
+
+async function removeStory(id) {
+  if (!currentUser || currentUser.uid !== ADMIN_UID) return;
+  if (!confirm("তুমি কি নিশ্চিত যে এই গল্পটি মুছে ফেলতে চাও?")) return;
+  try {
+    await deleteDoc(doc(db, "stories", id));
+    resetListing();
+    await loadNextPage();
+  } catch (error) {
+    console.error(error);
+    alert("গল্পটি মুছে ফেলা যায়নি। Firestore Rules পরীক্ষা করো।");
+  }
+}
+
+populateCategories();
+refreshCategoryButtons();
+const requestedStory = new URL(location.href).searchParams.get("story");
+if (requestedStory) openStoryById(requestedStory, false);
+loadNextPage();
+</script>
+</body>
+</html>
